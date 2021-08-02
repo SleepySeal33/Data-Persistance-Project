@@ -9,6 +9,7 @@ public class DataManager : MonoBehaviour
     public static DataManager DataInstance;
 	public string playerName;
 	public int highScore;
+	public string highScorePlayer;
 	public string highScoreText;
 
 	private void Awake()
@@ -22,14 +23,16 @@ public class DataManager : MonoBehaviour
 		{
 			DataInstance = this;
 			DontDestroyOnLoad(gameObject);
+			highScore = 0;
+			LoadHighScore();
 		}
-		highScore = 0;
 	}
 
 	[Serializable]
 	public class HighScoreData
 	{
 		public int highScore;
+		public string highScorePlayer;
 		public string highScoreText;
 	}
 
@@ -38,6 +41,7 @@ public class DataManager : MonoBehaviour
 		HighScoreData data = new HighScoreData();
 		data.highScore = highScore;
 		data.highScoreText = highScoreText;
+		data.highScorePlayer = highScorePlayer;
 		string json = JsonUtility.ToJson(data);
 		File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
 	}
@@ -51,16 +55,16 @@ public class DataManager : MonoBehaviour
 			HighScoreData data = JsonUtility.FromJson<HighScoreData>(json);
 			highScore = data.highScore;
 			highScoreText = data.highScoreText;
-
-
+			highScorePlayer = data.highScorePlayer;
+			HighScoreSet(highScore, highScorePlayer);
 		}
 	}
 
-	public void HighScoreSet(int points)
+	public void HighScoreSet(int points, string player)
 	{
 		highScore = points;
-		highScoreText = "Best score: " + playerName + " - " + highScore;
+		highScorePlayer = player;
+		highScoreText = "Best score: " + highScorePlayer + " - " + highScore;
 		SaveHighScore();
-		MainManager.Instance.highScoreTextUI.text = highScoreText;
 	}
 }
